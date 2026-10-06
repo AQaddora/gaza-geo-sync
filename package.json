@@ -1,0 +1,61 @@
+{
+  "name": "gaza-geo-sync",
+  "version": "0.1.0",
+  "description": "Compact binary position sync for low-bandwidth maps: ~7 bytes per moving vehicle, JSON fallback, offline-cache friendly. Built in Gaza.",
+  "license": "MIT",
+  "author": "Ahmed Qaddoura",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AQaddora/gaza-geo-sync.git"
+  },
+  "keywords": [
+    "gaza",
+    "binary-protocol",
+    "sync",
+    "offline-first",
+    "pwa",
+    "low-bandwidth",
+    "gps",
+    "varint",
+    "geolocation"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json --noEmit && vitest run",
+    "bench": "tsx bench/sizes.ts && tsx bench/decode-cpu.ts && tsx bench/uploads.ts",
+    "bench:sizes": "tsx bench/sizes.ts"
+  },
+  "devDependencies": {
+    "@msgpack/msgpack": "^3.1.3",
+    "@types/node": "^22.10.0",
+    "cbor-x": "^1.6.0",
+    "playwright-core": "^1.63.0",
+    "protobufjs": "^7.5.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

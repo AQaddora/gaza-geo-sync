@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif">
+  <title>gaza-geo-sync byte layout (format version 1)</title>
+  <rect width="900" height="470" fill="#fcfcfb"/>
+  <style>
+    .h { font-size: 18px; font-weight: 700; fill: #0b0b0b; }
+    .s { font-size: 13px; fill: #52514e; }
+    .b { font-size: 13px; font-weight: 600; fill: #0b0b0b; }
+    .w { font-size: 12px; fill: #52514e; }
+    .hdr { fill: #dfe8f6; stroke: #2a78d6; stroke-width: 1.5; }
+    .num { fill: #fde3d6; stroke: #eb6834; stroke-width: 1.5; }
+    .pos { fill: #d6f1e6; stroke: #1baf7a; stroke-width: 1.5; }
+    .opt { fill: #fdf0cc; stroke: #eda100; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .json { fill: #eeeeec; stroke: #8a8984; stroke-width: 1.5; }
+  </style>
+
+  <text x="24" y="34" class="h">One vehicle in a sync frame: 7 bytes (6 without speed)</text>
+  <text x="24" y="56" class="s">Steady state, inside the box, age &lt; 32 s, number gap &lt; 128. Everything else is rarer and costs a little more.</text>
+
+  <!-- the 7-byte row: 1 gap, 1 head, 2 dLat, 2 dLon, 1 speed ; 100 px per byte -->
+  <g transform="translate(24,76)">
+    <rect x="0" y="0" width="98" height="56" rx="4" class="num"/>
+    <text x="49" y="25" text-anchor="middle" class="b">gap in n</text>
+    <text x="49" y="44" text-anchor="middle" class="w">varint · 1 B</text>
+
+    <rect x="102" y="0" width="98" height="56" rx="4" class="num"/>
+    <text x="151" y="25" text-anchor="middle" class="b">head</text>
+    <text x="151" y="44" text-anchor="middle" class="w">varint · 1 B</text>
+
+    <rect x="204" y="0" width="198" height="56" rx="4" class="pos"/>
+    <text x="303" y="25" text-anchor="middle" class="b">dLat</text>
+    <text x="303" y="44" text-anchor="middle" class="w">uint16 · 2 B</text>
+
+    <rect x="406" y="0" width="198" height="56" rx="4" class="pos"/>
+    <text x="505" y="25" text-anchor="middle" class="b">dLon</text>
+    <text x="505" y="44" text-anchor="middle" class="w">uint16 · 2 B</text>
+
+    <rect x="608" y="0" width="98" height="56" rx="4" class="opt"/>
+    <text x="657" y="25" text-anchor="middle" class="b">speed</text>
+    <text x="657" y="44" text-anchor="middle" class="w">u8 · optional</text>
+
+    <rect x="710" y="0" width="98" height="56" rx="4" class="opt"/>
+    <text x="759" y="25" text-anchor="middle" class="b">heading</text>
+    <text x="759" y="44" text-anchor="middle" class="w">u8 · if enabled</text>
+  </g>
+
+  <!-- explanations -->
+  <g transform="translate(24,160)" class="s">
+    <text x="0" y="0"><tspan class="b">gap in n</tspan> — vehicles are numbered once (index table); numbers are sorted, so each costs its distance from the previous one.</text>
+    <text x="0" y="24"><tspan class="b">head</tspan> = ageSec × 4 + flags (×8 with heading). Flags: 1 speed present · 2 outside the box (absolute zigzag varints follow) · 4 heading present.</text>
+    <text x="0" y="48"><tspan class="b">dLat, dLon</tspan> — round(lat × 10⁵) − round(south × 10⁵): whole 1e-5° steps (≈1.1 m) from the box's south-west corner.</text>
+    <text x="0" y="72"><tspan class="b">speed</tspan> — m/s ÷ 0.25, capped at 255 (63.75 m/s). <tspan class="b">heading</tspan> — degrees × 256 / 360.</text>
+  </g>
+
+  <text x="24" y="270" class="h">Whole sync frame (kind 1)</text>
+  <g transform="translate(24,286)">
+    <rect x="0" y="0" width="110" height="50" rx="4" class="hdr"/>
+    <text x="55" y="22" text-anchor="middle" class="b">version|kind</text>
+    <text x="55" y="40" text-anchor="middle" class="w">u8 · 0x11</text>
+    <rect x="114" y="0" width="80" height="50" rx="4" class="hdr"/>
+    <text x="154" y="22" text-anchor="middle" class="b">profile</text>
+    <text x="154" y="40" text-anchor="middle" class="w">u8</text>
+    <rect x="198" y="0" width="120" height="50" rx="4" class="hdr"/>
+    <text x="258" y="22" text-anchor="middle" class="b">serverTime ms</text>
+    <text x="258" y="40" text-anchor="middle" class="w">varint · 6 B</text>
+    <rect x="322" y="0" width="100" height="50" rx="4" class="json"/>
+    <text x="372" y="22" text-anchor="middle" class="b">JSON length</text>
+    <text x="372" y="40" text-anchor="middle" class="w">varint</text>
+    <rect x="426" y="0" width="160" height="50" rx="4" class="json"/>
+    <text x="506" y="22" text-anchor="middle" class="b">JSON part</text>
+    <text x="506" y="40" text-anchor="middle" class="w">optional: index, extras</text>
+    <rect x="590" y="0" width="70" height="50" rx="4" class="num"/>
+    <text x="625" y="22" text-anchor="middle" class="b">count</text>
+    <text x="625" y="40" text-anchor="middle" class="w">varint</text>
+    <rect x="664" y="0" width="188" height="50" rx="4" class="pos"/>
+    <text x="758" y="22" text-anchor="middle" class="b">count × point</text>
+    <text x="758" y="40" text-anchor="middle" class="w">≈ 7 B each</text>
+  </g>
+
+  <text x="24" y="376" class="h">A phone's upload (kinds 2–4)</text>
+  <g transform="translate(24,392)">
+    <rect x="0" y="0" width="110" height="50" rx="4" class="hdr"/>
+    <text x="55" y="22" text-anchor="middle" class="b">version|kind</text>
+    <text x="55" y="40" text-anchor="middle" class="w">u8</text>
+    <rect x="114" y="0" width="80" height="50" rx="4" class="hdr"/>
+    <text x="154" y="22" text-anchor="middle" class="b">profile</text>
+    <text x="154" y="40" text-anchor="middle" class="w">u8</text>
+    <rect x="198" y="0" width="200" height="50" rx="4" class="opt"/>
+    <text x="298" y="22" text-anchor="middle" class="b">id (optional)</text>
+    <text x="298" y="40" text-anchor="middle" class="w">UUID 16 B · or u8 len + ASCII</text>
+    <rect x="402" y="0" width="190" height="50" rx="4" class="pos"/>
+    <text x="497" y="22" text-anchor="middle" class="b">point</text>
+    <text x="497" y="40" text-anchor="middle" class="w">head · dLat · dLon · speed</text>
+    <text x="610" y="22" class="b">= 8 B driver fix</text>
+    <text x="610" y="40" class="w">23 B with a UUID (JSON: 77 / 94 B)</text>
+  </g>
+</svg>
